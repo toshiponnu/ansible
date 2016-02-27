@@ -1,0 +1,9 @@
+[web-servers]
+192.168.33.100
+
+[db-servers]
+192.168.33.100
+
+[development:children]
+web-servers
+db-servers
