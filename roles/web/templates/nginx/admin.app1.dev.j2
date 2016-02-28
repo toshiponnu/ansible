@@ -1,0 +1,31 @@
+server {
+    listen 80;
+    server_name admin.app1.dev;
+    root {{rails_root}}/public;
+
+    error_page 404 /404.html;
+    error_page 400 401 403 500 502 503 504 /500.html;
+
+    location ~ ^/robots.txt {
+        root {{rails_root}}/public;
+        break;
+    }
+
+    location ~ ^/favicon.ico {
+        root {{rails_root}}/public;
+        break;
+    }
+
+    location ~ ^/assets/ {
+        root {{rails_root}}/public;
+        break;
+    }
+
+    location / {
+        if (-f $request_filename) { break; }
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded_For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_pass http://unicorn-app;
+    }
+}

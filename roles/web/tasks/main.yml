@@ -1,0 +1,7 @@
+---
+- include: git.yml
+- include: ruby.yml
+- include: imagemagick.yml
+- include: mysql_client.yml
+- include: nginx.yml
+- include: logrotate.yml

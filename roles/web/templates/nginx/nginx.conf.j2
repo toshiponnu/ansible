@@ -1,0 +1,73 @@
+user www-data;
+pid /var/run/nginx.pid;
+worker_processes auto;
+worker_rlimit_nofile 100000;
+
+events {
+    worker_connections 2048;
+    multi_accept on;
+    use epoll;
+}
+
+http {
+    server_tokens off;
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+
+    log_format ltsv 'time:$time_iso8601\t'
+                    'remote_addr:$remote_addr\t'
+                    'request_method:$request_method\t'
+                    'request_length:$request_length\t'
+                    'request_uri:$request_uri\t'
+                    'uri:$uri\t'
+                    'query_string:$query_string\t'
+                    'status:$status\t'
+                    'bytes_sent:$bytes_sent\t'
+                    'body_bytes_sent:$body_bytes_sent\t'
+                    'referer:$http_referer\t'
+                    'useragent:$http_user_agent\t'
+                    'forwardedfor:$http_x_forwarded_for\t'
+                    'request_time:$request_time\t'
+                    'upstream_response_time:$upstream_response_time';
+
+    access_log /var/log/nginx/access.log ltsv;
+    error_log /var/log/nginx/error.log;
+
+    keepalive_timeout 10;
+    client_header_timeout 10;
+    client_body_timeout 10;
+    reset_timedout_connection on;
+    send_timeout 10;
+
+    limit_conn_zone $binary_remote_addr zone=addr:5m;
+    limit_conn addr 100;
+
+    include /etc/nginx/mime.types;
+    default_type text/html;
+    charset UTF-8;
+
+    gzip on;
+    gzip_http_version 1.0;
+    gzip_disable "msie6";
+    gzip_proxied any;
+    gzip_min_length 1024;
+    gzip_comp_level 6;
+    gzip_types text/plain text/css text/xml application/json application/javascript application/x-javascript application/xml application/xml+rss;
+
+    open_file_cache max=100000 inactive=20s;
+    open_file_cache_valid 30s;
+    open_file_cache_min_uses 2;
+    open_file_cache_errors on;
+
+    proxy_buffer_size 32k;
+    proxy_buffers 8 32k;
+    proxy_busy_buffers_size 64k;
+
+    upstream unicorn-app {
+        server unix:/tmp/unicorn.sock;
+    }
+
+    include /etc/nginx/conf.d/*.conf;
+    include /etc/nginx/sites-enabled/*;
+}

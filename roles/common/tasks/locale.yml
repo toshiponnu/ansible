@@ -1,0 +1,3 @@
+---
+- name: create locale
+  locale_gen: name={{locale}} state=present 

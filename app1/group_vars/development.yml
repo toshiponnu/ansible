@@ -1,0 +1,7 @@
+---
+domain_names:
+  - app1.dev
+  - admin.app1.dev
+app_name: app1
+rails_env: development
+rails_root: /share/app1

@@ -1,0 +1,8 @@
+---
+- name: copy logrotate.d
+  template: src={{item.src}} dest={{item.dest}} owner=root group=root mode=644
+  with_items:
+    - src: logrotate/nginx
+      dest: /etc/logrotate.d/nginx
+    - src: logrotate/rails
+      dest: /etc/logrotate.d/rails

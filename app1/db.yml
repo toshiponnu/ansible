@@ -2,4 +2,4 @@
 - hosts: db-servers
   sudo: yes
   roles:
-    - db
+    - ../roles/db

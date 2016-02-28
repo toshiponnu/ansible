@@ -2,4 +2,4 @@
 - hosts: web-servers
   sudo: yes
   roles:
-    - web
+    - ../roles/web

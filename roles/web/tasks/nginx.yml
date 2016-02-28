@@ -1,0 +1,30 @@
+---
+- name: install nginx
+  apt: name=nginx state=present
+
+- name: remove nginx default
+  command: rm {{item}} removes={{item}}
+  with_items:
+    - /etc/nginx/sites-enabled/default
+    - /etc/nginx/sites-available/default
+
+- name: copy nginx index.html
+  copy: src=nginx/index.html dest=/usr/share/nginx/html/index.html owner=root group=root mode=644
+
+- name: nginx config
+  template: src=nginx/nginx.conf.j2 dest=/etc/nginx/nginx.conf owner=root group=root mode=644
+  notify: restart nginx
+
+- name: nginx config for app
+  template: src=nginx/{{item}}.j2 dest=/etc/nginx/sites-available/{{item}} owner=root group=root mode=644
+  notify: restart nginx
+  with_items: "{{domain_names}}"
+
+- name: symlink nginx config for app
+  file: src=/etc/nginx/sites-available/{{item}} dest=/etc/nginx/sites-enabled/{{item}} owner=root group=root state=link
+  notify: restart nginx
+  with_items: "{{domain_names}}"
+
+- name: start nginx
+  service: name=nginx state=started enabled=yes
+

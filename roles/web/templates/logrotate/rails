@@ -1,0 +1,14 @@
+{{rails_root}}/log/*.log {
+  daily
+  missingok
+  rotate 60
+  dateext
+  compress
+  delaycompress
+  notifempty
+  sharedscripts
+  lastaction
+    pid={{rails_root}}/tmp/pids/unicorn.pid
+    test -s $pid && kill -USR1 "$(cat $pid)"
+  endscript
+}

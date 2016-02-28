@@ -1,0 +1,10 @@
+---
+- name: install mysql-server
+  apt: name=mysql-server-{{mysql_version}}
+
+- name: set my.cnf
+  copy: src=mysql/my.cnf dest=/etc/my.cnf owner=root group=root mode=644
+  notify: restart mysql
+
+- name: start mysqld
+  service: name=mysql state=started enabled=yes
