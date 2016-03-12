@@ -1,5 +1,5 @@
 ---
 - hosts: monitoring-servers
-  sudo: yes
+  become: yes
   roles:
     - ../roles/monitoring

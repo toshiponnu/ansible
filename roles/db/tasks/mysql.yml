@@ -2,9 +2,25 @@
 - name: install mysql-server
   apt: name=mysql-server-{{mysql_version}}
 
+- name: install mysql python
+  apt: name=python-mysqldb state=present
+
 - name: set my.cnf
-  copy: src=mysql/my.cnf dest=/etc/my.cnf owner=root group=root mode=644
+  template: src=mysql/my.cnf.j2 dest=/etc/my.cnf owner=root group=root mode=644
   notify: restart mysql
 
 - name: start mysqld
   service: name=mysql state=started enabled=yes
+
+- name: removes anonymous user account for localhost
+  mysql_user: name='' host=localhost state=absent
+
+- name: create database
+  mysql_db: db={{db_name}} state=present encoding=utf8mb4
+
+- name: add mysql user
+  mysql_user: name={{db_user}} password={{db_pass}} host=% priv="{{db_name}}.*:ALL" state=present
+
+- name: set root password
+  mysql_user: name=root host=localhost password={{mysql_root_password}}
+

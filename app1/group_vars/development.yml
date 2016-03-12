@@ -5,3 +5,7 @@ domain_names:
 app_name: app1
 rails_env: development
 rails_root: /share/app1
+mysql_root_password: rootapp1
+db_user: app1
+db_name: app1
+db_pass: app1pass

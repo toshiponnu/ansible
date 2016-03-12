@@ -1,6 +1,6 @@
 ---
 - name: install rbenv
-  sudo: no
+  become: no
   git: repo={{item.repo}} dest={{item.dest}} accept_hostkey=yes
   with_items:
     - repo: git://github.com/sstephenson/rbenv.git
@@ -9,8 +9,11 @@
       dest: ~/.rbenv/plugins/ruby-build
 
 - name: copy .bash_profile
-  sudo: no
-  template: src=ruby/bash_profile dest=~/.bash_profile mode=644
+  become: no
+  template: src=ruby/bash_profile.j2 dest=~/.bash_profile mode=644
+
+- name: update apt list
+  apt: update_cache=yes
 
 - name: install ruby dependency packages
   apt: name={{item}} state=present
@@ -26,19 +29,19 @@
     - libmysqld-dev
 
 - name: installed ruby check
-  sudo: no
+  become: no
   shell: /bin/bash -lc "rbenv versions | grep {{ruby_version}}"
   register: ruby_installed
   ignore_errors: yes
   changed_when: false
 
 - name: install ruby
-  sudo: no
+  become: no
   shell: /bin/bash -lc "rbenv install {{ruby_version}} && rbenv rehash && rbenv global {{ruby_version}}"
   when: ruby_installed|failed
 
 - name: install gems
-  sudo: no
+  become: no
   gem: name={{item}} executable=~/.rbenv/shims/gem state=present user_install=no
   with_items:
     - bundler
